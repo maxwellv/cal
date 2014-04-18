@@ -53,7 +53,7 @@ class CalTest < MiniTest::Unit::TestCase
 
   def test_cal_integration
     shell_output = ""
-    IO.popen('ruby cal.rb 1 2014', 'r+') do |pipe|
+    IO.popen('ruby lib/cal.rb 1 2014', 'r+') do |pipe|
       shell_output = pipe.read
     end
     expected_output = <<EOS

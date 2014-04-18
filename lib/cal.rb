@@ -1,3 +1,7 @@
+#!/usr/bin/env ruby
+#The above line tells the shell to run this using ruby instead of as a normal shell script.
+#Chmod this file +x to run it from the command line.
+
 days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 day_of_week_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
