@@ -37,7 +37,7 @@ class CalTest < MiniTest::Unit::TestCase
     assert_equal(" 1  2  3  4  5  6  7", week_1)
     assert_equal("             1  2  3", week_2)
     assert_equal("11 12 13 14 15 16 17", week_3)
-    #assert_equal("29 30               ", week_4)
+    assert_equal("29 30               ", week_4)
     assert_equal("25 26 27 28         ", week_5)
     assert_equal("25 26 27 28 29      ", week_6)
     assert_equal("27 28 29 30 31      ", week_7)
