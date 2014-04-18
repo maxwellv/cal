@@ -65,26 +65,53 @@ def make_week(day, day_of_week, month, leap)
 end
 
 def make_month(weeks, month, year = nil)
+  month_width = 20
   ret_month = []
   month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   month_name = month_names[month - 1]#Months will be one-indexed, same as with weeks up above.
   if (year != nil)
     month_name += " " + year.to_s
   end
-  month_name = month_name.center(20)
+  month_name = month_name.center(month_width)
   ret_month.push(month_name)
   ret_month.push("Su Mo Tu We Th Fr Sa")#Barring a major change to the Gregorian calendar, the names of the days of the week will always be the same.
   weeks.each do |week|
     ret_month.push(week)
   end
+  while (ret_month.length < 8)
+    #Unix cal automatically pads months out to eight lines each, no matter how short they are.
+    ret_month.push("".ljust(month_width))
+  end
   return ret_month
+end
+
+def make_year(months, year)
+  ret_year = []
+  ret_year.push(year.to_s.center(62))
+  ret_year.push("".ljust(66)) #Unix cal puts an extra line between the year and the first month
+  ranges = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]
+  ranges.each do |range|
+    selected_line = 0
+    current_line = ""
+    while (selected_line < 8)
+      range.each do |selected_month|
+        current_line += months[selected_month - 1][0][selected_line]
+        if (selected_month % 3 != 0) #if it's not the last month in the range
+          current_line += "  "
+        end
+      end
+      ret_year.push(current_line)
+      current_line = ""
+      selected_line += 1
+    end
+  end
+  return ret_year
 end
 
 if (ARGV.length < 1 || ARGV.length > 2)
   puts "Usage: \"cal.rb <year>\", or \"cal.rb <month number> <year>\""
 else
   if (ARGV.length == 1)
-    #displaying an entire year is as yet unimplemented, so for right now we'll assume the user wanted January
     month = 0
     year = ARGV[0].to_i
   else
@@ -92,33 +119,51 @@ else
     year = ARGV[1].to_i
   end
 
-  if (month > 12 || month < 1)
+  if (month > 12 || month < 0)
     puts "Invalid month."
   elsif (year > 3000 || year < 1800)
     puts "Invalid year (years must be between 1800 and 3000)."
   else #run the rest of the program
-    #We only need to compute the day of the week once. After that, we can just increment it.
-    day_of_week_index = zeller(1, month, year)
-    day_offset = 7 - (day_of_week_index - 1)
-    calendar = []
-    days = days_in_month[month - 1]
+    if (month == 0)
+      months = (1..12).to_a
+    else
+      months = [month]
+    end
     leap = is_leap_year(year)
-    if (leap && month == 2)
-      days += 1
-    end
-    calendar.push(make_week(1, day_of_week_index, month, leap))
-    while true
-      if (day_offset > days)
-        break
+    rendered_months = []
+    months.each do |selected_month|
+      day_of_week_index = zeller(1, selected_month, year)
+      day_offset = 7 - (day_of_week_index - 1)
+      calendar = []
+      days = days_in_month[selected_month - 1]
+      if (leap && selected_month == 2)
+        days += 1
       end
-      calendar.push(make_week(day_offset, 0, month,  leap)) #additional weeks always start on Sunday
-      day_offset += 7
+      calendar.push(make_week(1, day_of_week_index, selected_month, leap))
+      while true
+        if (day_offset > days)
+          break
+        end
+        calendar.push(make_week(day_offset, 0, selected_month,  leap)) #additional weeks always start on Sunday
+        day_offset += 7
+      end
+      if (months.length > 1)
+        calendar = make_month(calendar, selected_month, nil) #nil specifies that the year will not appear next to the month
+      else
+        calendar = make_month(calendar, selected_month, year)
+      end
+      rendered_months.push([calendar])
     end
-    calendar = make_month(calendar, month, year)
-    calendar.each do |line|
-      puts line
+    if (rendered_months.length == 1)
+      calendar = rendered_months[0]
+      calendar.each do |line|
+        puts line
+      end
+    else
+      year = make_year(rendered_months, year)
+      year.each do |line|
+        puts line
+      end
     end
-    #cal puts out one extra line of whitespace, so let's reproduce it here
-    puts ""
   end
 end
