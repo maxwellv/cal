@@ -57,14 +57,14 @@ class CalTest < MiniTest::Unit::TestCase
       shell_output = pipe.read
     end
     expected_output = <<EOS
-    January 2014    
+    January 2014
 Su Mo Tu We Th Fr Sa
           1  2  3  4
  5  6  7  8  9 10 11
 12 13 14 15 16 17 18
 19 20 21 22 23 24 25
-26 27 28 29 30 31   
-                    
+26 27 28 29 30 31
+
 EOS
     assert_equal(expected_output, shell_output)
   end
@@ -75,42 +75,102 @@ EOS
       shell_output = pipe.read
     end
     expected_output = <<EOS
-                             2014                             
-                                                                  
-      January               February               March        
+                             2014
+
+      January               February               March
 Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
           1  2  3  4                     1                     1
  5  6  7  8  9 10 11   2  3  4  5  6  7  8   2  3  4  5  6  7  8
 12 13 14 15 16 17 18   9 10 11 12 13 14 15   9 10 11 12 13 14 15
 19 20 21 22 23 24 25  16 17 18 19 20 21 22  16 17 18 19 20 21 22
 26 27 28 29 30 31     23 24 25 26 27 28     23 24 25 26 27 28 29
-                                            30 31               
-       April                  May                   June        
+                                            30 31
+       April                  May                   June
 Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
        1  2  3  4  5               1  2  3   1  2  3  4  5  6  7
  6  7  8  9 10 11 12   4  5  6  7  8  9 10   8  9 10 11 12 13 14
 13 14 15 16 17 18 19  11 12 13 14 15 16 17  15 16 17 18 19 20 21
 20 21 22 23 24 25 26  18 19 20 21 22 23 24  22 23 24 25 26 27 28
-27 28 29 30           25 26 27 28 29 30 31  29 30               
-                                                                
-        July                 August              September      
+27 28 29 30           25 26 27 28 29 30 31  29 30
+
+        July                 August              September
 Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
        1  2  3  4  5                  1  2      1  2  3  4  5  6
  6  7  8  9 10 11 12   3  4  5  6  7  8  9   7  8  9 10 11 12 13
 13 14 15 16 17 18 19  10 11 12 13 14 15 16  14 15 16 17 18 19 20
 20 21 22 23 24 25 26  17 18 19 20 21 22 23  21 22 23 24 25 26 27
-27 28 29 30 31        24 25 26 27 28 29 30  28 29 30            
-                      31                                        
-      October               November              December      
+27 28 29 30 31        24 25 26 27 28 29 30  28 29 30
+                      31
+      October               November              December
 Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
           1  2  3  4                     1      1  2  3  4  5  6
  5  6  7  8  9 10 11   2  3  4  5  6  7  8   7  8  9 10 11 12 13
 12 13 14 15 16 17 18   9 10 11 12 13 14 15  14 15 16 17 18 19 20
 19 20 21 22 23 24 25  16 17 18 19 20 21 22  21 22 23 24 25 26 27
-26 27 28 29 30 31     23 24 25 26 27 28 29  28 29 30 31         
-                      30                                        
+26 27 28 29 30 31     23 24 25 26 27 28 29  28 29 30 31
+                      30
 EOS
     assert_equal(expected_output, shell_output)
   end
+
+  def test_cal_year_integration_with_funky_rows_and_columns
+    shell_output = ""
+    IO.popen('ruby lib/cal.rb 2014 --rows=6 --columns=2', 'r+') do |pipe|
+      shell_output = pipe.read
+    end
+    expected_output = <<EOS
+                  2014
+
+      January               February
+Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
+          1  2  3  4                     1
+ 5  6  7  8  9 10 11   2  3  4  5  6  7  8
+12 13 14 15 16 17 18   9 10 11 12 13 14 15
+19 20 21 22 23 24 25  16 17 18 19 20 21 22
+26 27 28 29 30 31     23 24 25 26 27 28
+
+       March                 April
+Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
+                   1         1  2  3  4  5
+ 2  3  4  5  6  7  8   6  7  8  9 10 11 12
+ 9 10 11 12 13 14 15  13 14 15 16 17 18 19
+16 17 18 19 20 21 22  20 21 22 23 24 25 26
+23 24 25 26 27 28 29  27 28 29 30
+30 31
+        May                   June
+Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
+             1  2  3   1  2  3  4  5  6  7
+ 4  5  6  7  8  9 10   8  9 10 11 12 13 14
+11 12 13 14 15 16 17  15 16 17 18 19 20 21
+18 19 20 21 22 23 24  22 23 24 25 26 27 28
+25 26 27 28 29 30 31  29 30
+
+        July                 August
+Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
+       1  2  3  4  5                  1  2
+ 6  7  8  9 10 11 12   3  4  5  6  7  8  9
+13 14 15 16 17 18 19  10 11 12 13 14 15 16
+20 21 22 23 24 25 26  17 18 19 20 21 22 23
+27 28 29 30 31        24 25 26 27 28 29 30
+                      31
+     September              October
+Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
+    1  2  3  4  5  6            1  2  3  4
+ 7  8  9 10 11 12 13   5  6  7  8  9 10 11
+14 15 16 17 18 19 20  12 13 14 15 16 17 18
+21 22 23 24 25 26 27  19 20 21 22 23 24 25
+28 29 30              26 27 28 29 30 31
+
+      November              December
+Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
+                   1      1  2  3  4  5  6
+ 2  3  4  5  6  7  8   7  8  9 10 11 12 13
+ 9 10 11 12 13 14 15  14 15 16 17 18 19 20
+16 17 18 19 20 21 22  21 22 23 24 25 26 27
+23 24 25 26 27 28 29  28 29 30 31
+30
+EOS
+    assert_equal(expected_output, shell_output)
+end
 
 end

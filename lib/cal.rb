@@ -85,18 +85,35 @@ def make_month(weeks, month, year = nil)
   return ret_month
 end
 
-def make_year(months, year)
+def make_year(months, year, rows, columns)
+  line_length = columns * 22
   ret_year = []
-  ret_year.push(year.to_s.center(62))
-  ret_year.push("".ljust(66)) #Unix cal puts an extra line between the year and the first month
-  ranges = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]
+  ret_year.push(year.to_s.center(line_length - year.to_s.length))
+  ret_year.push("".ljust(line_length)) #Unix cal puts an extra line between the year and the first month
+  ranges = []
+  total_months = rows * columns
+  current_month = 1 #start at January...
+  row = []
+  (total_months + 1).times do
+    if (row.length == columns)
+      ranges.push(row)
+      row = []
+    end
+    if (current_month > 12)
+      #The calendar is only ever going to have 12 months, maximum. This is in case the user specifies something wild, like rows = 10 and columns = 33.
+      break
+    end
+    row.push(current_month)
+    current_month += 1
+  end
+
   ranges.each do |range|
     selected_line = 0
     current_line = ""
-    while (selected_line < 8)
+    while (selected_line < 8) #eight lines in each month, no matter how long the month actually is
       range.each do |selected_month|
         current_line += months[selected_month - 1][0][selected_line]
-        if (selected_month % 3 != 0) #if it's not the last month in the range
+        if (selected_month % columns != 0) #if it's not the last month in the range
           current_line += "  "
         end
       end
@@ -108,15 +125,27 @@ def make_year(months, year)
   return ret_year
 end
 
-if (ARGV.length < 1 || ARGV.length > 2)
-  puts "Usage: \"cal.rb <year>\", or \"cal.rb <month number> <year>\""
+use_error_message = ["Usage: \"cal.rb <year>\", or \"cal.rb <month number> <year>\"", "If you are using a single year, you may specify --rows=X and --columns=Y to further format the display."]
+
+if (ARGV.length < 1 || ARGV.length > 3)
+  puts use_error_message
 else
-  if (ARGV.length == 1)
-    month = 0
-    year = ARGV[0].to_i
-  else
-    month = ARGV[0].to_i
-    year = ARGV[1].to_i
+  rows = 4    #default rows and columns that Unix cal uses
+  columns = 3
+  month = year = 0
+  ARGV.each do |arg|
+    if arg[0..6] == "--rows="
+      rows = arg[7..arg.length - 1].to_i
+    elsif arg[0..9] == "--columns="
+      columns = arg[10..arg.length - 1].to_i
+    else
+      value = arg.to_i
+      if (value < 13)
+        month = value
+      else
+        year = value
+      end
+    end
   end
 
   if (month > 12 || month < 0)
@@ -155,14 +184,14 @@ else
       rendered_months.push([calendar])
     end
     if (rendered_months.length == 1)
-      calendar = rendered_months[0]
+      calendar = rendered_months[0][0]
       calendar.each do |line|
-        puts line
+        puts line.to_s.rstrip
       end
     else
-      year = make_year(rendered_months, year)
+      year = make_year(rendered_months, year, rows, columns)
       year.each do |line|
-        puts line
+        puts line.to_s.rstrip
       end
     end
   end
