@@ -3,7 +3,6 @@
 #Chmod this file +x to run it from the command line.
 
 days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-day_of_week_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 def is_leap_year(year)
   if (year % 4 == 0 && year % 100 != 0)
@@ -101,6 +100,7 @@ def make_year(months, year, rows, columns)
     end
     if (current_month > 12)
       #The calendar is only ever going to have 12 months, maximum. This is in case the user specifies something wild, like rows = 10 and columns = 33.
+      #Note: The user can also specify fewer than 12 months by this method. In that case, it's what the user wanted...
       break
     end
     row.push(current_month)
